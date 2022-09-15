@@ -49,3 +49,52 @@ AS
 	END
 
 insert into COPYCARGO2 values ('100', 'TESTE', 40, 2)
+
+---- TG_Cancela2  não deixa excluir nenhum dado da tabela
+SELECT * INTO COPYINSCRITOS FROM INSCRITOS
+SELECT * FROM COPYINSCRITOS
+
+CREATE TRIGGER TG_Cancela2
+	ON COPYINSCRITOS
+		AFTER DELETE
+AS
+  BEGIN
+		PRINT 'Houve tentativa de exclusão de dados....Ação cancelada'
+		ROLLBACK
+  END
+
+ DELETE FROM COPYINSCRITOS
+ WHERE  nome = 'renato fonseca oliveira'; 
+
+ --- TG_VALOR_INSERIDO criando tabela
+  SELECT * FROM INSERTED WHERE CPF IS NULL
+ select * from USUARIO
+ CREATE TABLE USUARIO
+ (
+	CPF NUMERIC(11) NOT NULL PRIMARY KEY,
+	NOME VARCHAR(50) NOT NULL,
+	EMAIL VARCHAR(50) NOT NULL,
+	FONE VARCHAR(50) NOT NULL
+ )
+
+ CREATE TRIGGER TG_VALOR_INSERIDO
+ ON USUARIO
+ AFTER INSERT
+ AS
+	IF(SELECT COUNT(*) FROM inserted) = 1
+		PRINT 'O registro foi inserido com sucesso'
+
+INSERT INTO USUARIO (CPF, NOME, EMAIL,FONE) VALUES (18509565606,'Gutierrez', 'gutierrez@gmail.com', '(91)998587456')
+
+--- Tg atualza o valor da tabela 
+ CREATE TRIGGER TG_ATUALIZA_VALOR
+ ON USUARIO
+	FOR UPDATE
+ AS
+	IF(SELECT COUNT(*) FROM deleted) <> 0
+		SELECT * FROM deleted
+		SELECT * FROM inserted
+
+UPDATE USUARIO
+	SET NOME = 'Carlos Gutierrez'
+	WHERE NOME='Gutierrez'
