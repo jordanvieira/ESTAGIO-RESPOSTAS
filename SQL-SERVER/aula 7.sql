@@ -1,3 +1,4 @@
+-- TRIGGER
 --- TG_teste emitirá um aviso toda vez que um registro for incluido na tabela cargo
   
 SELECT * INTO COPYCARGO FROM CARGO--- Joga os dados na tabela de copia do cargo
@@ -21,3 +22,30 @@ AS
 	WHERE descricao LIKE 'PROF%'
 
 UPDATE COPYCARGO SET grau=7 WHERE codcargo=5
+
+--- Tg_Cancela realiza o rollback em qualquer ação sendo insert, update, delete
+CREATE TRIGGER TG_Cancela
+	ON COPYCARGO
+		FOR INSERT, UPDATE, DELETE
+AS
+  BEGIN
+		PRINT 'AÇÃO CANCELADA . . .'
+		ROLLBACK
+  END
+
+INSERT INTO COPYCARGO VALUES ('88',  'DBA', '100', '4')
+UPDATE COPYCARGO SET grau=7 WHERE codcargo=14
+
+--- TG_Test4 realiza o update de 50% sempre que realiza algum insert
+SELECT * INTO COPYCARGO2 FROM CARGO
+
+CREATE TRIGGER TG_Teste4
+	ON COPYCARGO2
+		INSTEAD OF INSERT
+AS
+	BEGIN
+		UPDATE COPYCARGO2
+		SET valor_inscricao = valor_inscricao*1.5
+	END
+
+insert into COPYCARGO2 values ('100', 'TESTE', 40, 2)
